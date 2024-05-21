@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,13 +7,10 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
 @AllArgsConstructor
-public class User {
+public class UserDto {
     private Long id;
 
     @NotBlank(message = "Имя пользователя не может быть пустым")
@@ -21,4 +18,9 @@ public class User {
 
     @Email(message = "Указан некорректный Email")
     private String email;
+
+    public UserDto(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }
