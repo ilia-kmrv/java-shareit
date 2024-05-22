@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,14 +11,12 @@ import javax.validation.constraints.NotBlank;
  * TODO Sprint add-controllers.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class User {
     private Long id;
 
-    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String name;
 
-    @Email(message = "Указан некорректный Email")
     private String email;
 }

@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,15 +26,9 @@ public class ItemDto {
     @NotNull(message = "Доступность предмета не может быт null")
     private Boolean isAvailable;
 
-    @NotNull(message = "У предмета не может не быть хозяина")
-    private User owner;
+    @NotNull(message = "У предмета не может не быть владельца")
+    private Long ownerId;
 
-    private Long request;
+    private Long requestId;
 
-    public ItemDto(String name, String description, Boolean isAvailable, Long requestId) {
-        this.name = name;
-        this.description = description;
-        this.isAvailable = isAvailable;
-        this.request = requestId;
-    }
 }

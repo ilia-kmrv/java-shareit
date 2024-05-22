@@ -3,11 +3,8 @@ package ru.practicum.shareit.item.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
 /**
  * TODO Sprint add-controllers.
@@ -18,16 +15,13 @@ import javax.validation.constraints.NotNull;
 public class Item {
     private Long id;
 
-    @NotBlank(message = "Название предмета не может быть пустым")
     private String name;
 
     private String description;
 
-    @NotNull(message = "Доступность предмета не может быт null")
     private Boolean isAvailable;
 
-    @NotNull(message = "У предмета не может не быть хозяина")
-    private User owner;
+    private Long ownerId;
 
-    private ItemRequest request;
+    private Long requestId;
 }
