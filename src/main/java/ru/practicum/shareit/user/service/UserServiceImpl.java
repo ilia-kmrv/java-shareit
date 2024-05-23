@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
                 .anyMatch(u -> u.getEmail().equals(user.getEmail()) && !u.getId().equals(user.getId()));
 
         if (isNotUniqueEmail) {
-            throw new ResourceAlreadyExistsException (String.format("Указанный Email %s уже занят", user.getEmail()));
+            throw new ResourceAlreadyExistsException(String.format("Указанный Email %s уже занят", user.getEmail()));
         }
     }
 }

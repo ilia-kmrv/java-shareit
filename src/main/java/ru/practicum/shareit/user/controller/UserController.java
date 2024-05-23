@@ -30,34 +30,34 @@ public class UserController {
     @PostMapping
     @Validated(OnCreate.class)
     public UserDto postUser(@Valid @RequestBody UserDto userDto) {
-        log.debug("Получен запрос на добавление пользователя");
+        log.info("Получен запрос на добавление пользователя");
         User user = UserMapper.toUser(userDto);
         return UserMapper.toUserDto(userService.addUser(user));
     }
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable Long userId) {
-        log.debug("Получен запрос на просмотр пользователя");
+        log.info("Получен запрос на просмотр пользователя c id={}", userId);
         return UserMapper.toUserDto(userService.getUser(userId));
     }
 
     @GetMapping
     public Collection<UserDto> getAllUsers() {
-        log.debug("Получен запрос на просмотр всех пользователей");
+        log.info("Получен запрос на просмотр всех пользователей");
         return userService.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @PatchMapping("/{userId}")
     @Validated(OnUpdate.class)
     public UserDto patchUser(@Valid @RequestBody UserDto userDto, @PathVariable Long userId) {
-        log.debug("Получен запрос на обновление пользователя");
+        log.info("Получен запрос на обновление пользователя c id={}", userId);
         User user = UserMapper.toUser(userDto);
         return UserMapper.toUserDto(userService.updateUser(user, userId));
     }
 
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId) {
-        log.debug("Получен запрос на удаление пользователя");
+        log.info("Получен запрос на удаление пользователя c id={}", userId);
         userService.deleteUser(userId);
     }
 

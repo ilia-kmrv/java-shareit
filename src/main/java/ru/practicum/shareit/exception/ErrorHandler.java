@@ -35,6 +35,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handle(final PermissionDeniedException e) {
+        log.warn(e.getMessage());
+        return new ErrorResponse("Доступ запрещен", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final ConstraintViolationException e) {
         log.warn(e.getMessage());
