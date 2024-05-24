@@ -53,8 +53,9 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item itemForUpdate = itemInDb.toBuilder()
-                .name(item.getName() == null ? itemInDb.getName() : item.getName())
-                .description(item.getDescription() == null ? itemInDb.getDescription() : item.getDescription())
+                .name((item.getName() == null || item.getName().isBlank()) ? itemInDb.getName() : item.getName())
+                .description((item.getDescription() == null ||
+                        item.getDescription().isBlank()) ? itemInDb.getDescription() : item.getDescription())
                 .available(item.getAvailable() == null ? itemInDb.getAvailable() : item.getAvailable())
                 .build();
         return itemStorage.update(itemForUpdate);
