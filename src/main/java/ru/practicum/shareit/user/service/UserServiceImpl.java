@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import ru.practicum.shareit.exception.ResourceAlreadyExistsException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.user.model.User;
