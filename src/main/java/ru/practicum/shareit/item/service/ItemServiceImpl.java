@@ -8,6 +8,7 @@ import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.item.dao.ItemStorage;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.util.Util;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -53,9 +54,8 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item itemForUpdate = itemInDb.toBuilder()
-                .name((item.getName() == null || item.getName().isBlank()) ? itemInDb.getName() : item.getName())
-                .description((item.getDescription() == null ||
-                        item.getDescription().isBlank()) ? itemInDb.getDescription() : item.getDescription())
+                .name(Util.isBlank(item.getName()) ? itemInDb.getName() : item.getName())
+                .description(Util.isBlank(item.getDescription()) ? itemInDb.getDescription() : item.getDescription())
                 .available(item.getAvailable() == null ? itemInDb.getAvailable() : item.getAvailable())
                 .build();
         return itemStorage.update(itemForUpdate);

@@ -7,6 +7,7 @@ import ru.practicum.shareit.exception.ResourceAlreadyExistsException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dao.UserStorage;
+import ru.practicum.shareit.util.Util;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -43,8 +44,8 @@ public class UserServiceImpl implements UserService {
         log.debug("Обработка запроса на обновление пользователя c id={}", user.getId());
         User userInDb = getUser(id);
         User userForUpdate = userInDb.toBuilder()
-                .name((user.getName() == null || user.getName().isBlank()) ? userInDb.getName() : user.getName())
-                .email(user.getEmail() == null  ? userInDb.getEmail() : user.getEmail())
+                .name(Util.isBlank(user.getName()) ? userInDb.getName() : user.getName())
+                .email(user.getEmail() == null ? userInDb.getEmail() : user.getEmail())
                 .build();
         checkEmail(userForUpdate);
         return userStorage.update(userForUpdate);
