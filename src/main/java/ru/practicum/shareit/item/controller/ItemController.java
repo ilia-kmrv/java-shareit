@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.util.Header;
 import ru.practicum.shareit.validation.OnCreate;
 import ru.practicum.shareit.validation.OnUpdate;
 
@@ -24,12 +25,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Validated
 public class ItemController {
-    private static final String OWNER_ID_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping
     @Validated(OnCreate.class)
-    public ItemDto postItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(OWNER_ID_HEADER) Long ownerId) {
+    public ItemDto postItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(Header.USER_ID) Long ownerId) {
         log.info("Получен запрос на добавление вещи для пользователя с id={}", ownerId);
         Item item = ItemMapper.toItem(itemDto);
         return ItemMapper.toItemDto(itemService.addItem(item, ownerId));
@@ -42,7 +42,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getAllItems(@RequestHeader(OWNER_ID_HEADER) Long ownerId) {
+    public Collection<ItemDto> getAllItems(@RequestHeader(Header.USER_ID) Long ownerId) {
         log.info("Получен запрос на просмотр всех вещей пользователя id={}", ownerId);
         return itemService.getAllItems(ownerId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
@@ -51,14 +51,14 @@ public class ItemController {
     @Validated(OnUpdate.class)
     public ItemDto patchItem(@Valid @RequestBody ItemDto itemDto,
                              @PathVariable Long itemId,
-                             @RequestHeader(OWNER_ID_HEADER) Long ownerId) {
+                             @RequestHeader(Header.USER_ID) Long ownerId) {
         log.info("Получен запрос на обновление вещи c id={} пользователем с id={}", itemId, ownerId);
         Item item = ItemMapper.toItem(itemDto);
         return ItemMapper.toItemDto(itemService.updateItem(item, itemId, ownerId));
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem(@PathVariable Long itemId, @RequestHeader(OWNER_ID_HEADER) Long ownerId) {
+    public void deleteItem(@PathVariable Long itemId, @RequestHeader(Header.USER_ID) Long ownerId) {
         log.info("Получен запрос на удаление вещи c id={} пользователем c id={}", itemId, ownerId);
         itemService.deleteItem(itemId, ownerId);
     }
