@@ -38,7 +38,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final ResourceValidationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse("Ошибка валидации", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler

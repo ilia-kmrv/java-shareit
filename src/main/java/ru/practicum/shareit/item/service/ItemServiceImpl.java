@@ -4,15 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.PermissionDeniedException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.OwnerItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.Util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,6 +26,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserService userService;
+    private final BookingService bookingService;
 
     @Override
     @Transactional
@@ -33,18 +39,31 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public Item getItem(Long itemId) {
+    public OwnerItemDto getItem(Long itemId, Long userId) {
         log.debug("Обработка запроса на получение вещи");
-        return itemRepository.findById(itemId)
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
+        User user = userService.getUser(userId);
+
+        if (!item.getOwnerId().equals(user.getId())) {
+            return ItemMapper.toOwnerItemDto(item, null, null);
+        }
+
+        return ItemMapper.toOwnerItemDto(item,
+                bookingService.getLastBooking(itemId),
+                bookingService.getNextBooking(itemId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Item> getAllItems(Long ownerId) {
-        log.debug("Обработка запроса на получение вещи");
+    public Collection<OwnerItemDto> getAllItems(Long ownerId) {
+        log.debug("Обработка запроса на получение всех вещей пользователя  id={}", ownerId);
         userService.getUser(ownerId);
-        return itemRepository.findByOwnerId(ownerId);
+        return itemRepository.findByOwnerId(ownerId).stream()
+                .map(i -> ItemMapper.toOwnerItemDto(i,
+                        bookingService.getLastBooking(i.getId()),
+                        bookingService.getNextBooking(i.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -52,7 +71,8 @@ public class ItemServiceImpl implements ItemService {
     public Item updateItem(Item item, Long itemId, Long ownerId) {
         log.debug("Обработка запроса на обновление вещи c id={}", item.getId());
         userService.getUser(ownerId);
-        Item itemInDb = getItem(itemId);
+        Item itemInDb = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
 
         if (!itemInDb.getOwnerId().equals(ownerId)) {
             throw new PermissionDeniedException("Вещь не принадлежит данному пользователю");
@@ -71,7 +91,9 @@ public class ItemServiceImpl implements ItemService {
     public void deleteItem(Long itemId, Long ownerId) {
         log.debug("Обработка запроса на удаление вещи c id={}", itemId);
         userService.getUser(ownerId);
-        if (getItem(itemId).getOwnerId().equals(ownerId)) {
+        Item itemInDb = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
+        if (itemInDb.getOwnerId().equals(ownerId)) {
             itemRepository.deleteById(itemId);
         }
     }

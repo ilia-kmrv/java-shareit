@@ -5,17 +5,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.InputBookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.dto.ShortBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exception.PermissionDeniedException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.exception.ResourceValidationException;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +29,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserService userService;
-    private final ItemService itemService;
+    private final ItemRepository itemRepository;
 
 
     @Override
@@ -32,14 +37,16 @@ public class BookingServiceImpl implements BookingService {
     public Booking addBooking(InputBookingDto inputBookingDto, Long bookerId) {
         log.debug("Обработка запроса на бронирование вещи={} от пользователя={}", inputBookingDto.getItemId(), bookerId);
         User user = userService.getUser(bookerId);
-        Item item = itemService.getItem(inputBookingDto.getItemId());
+        Item item = itemRepository.findById(inputBookingDto.getItemId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена",
+                        inputBookingDto.getItemId())));
 
         if (!item.getAvailable()) {
             throw new ResourceValidationException("Вещь уже забронирована");
         }
 
         if (user.getId().equals(item.getOwnerId())) {
-            throw new ResourceValidationException("Нельзя бронировать собственную вещь");
+            throw new ResourceNotFoundException("Нельзя бронировать собственную вещь");
         }
 
         if (inputBookingDto.getEnd().isBefore(inputBookingDto.getStart()) || inputBookingDto.getStart().isEqual(inputBookingDto.getEnd())) {
@@ -51,13 +58,27 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Booking getBooking(Long id) {
         log.debug("Обработка запроса на просмотр бронирования с id={}", id);
         return bookingRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException(String.format("Бронирование с id=%d не найдено", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Бронирование с id=%d не найдено", id)));
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Booking getBookingByUserId(Long bookingId, Long userId) {
+        log.debug("Обработка запроса на просмотр бронирования с id={}", bookingId);
+        Booking booking = getBooking(bookingId);
+        User user = userService.getUser(userId);
+        if (!booking.getBooker().getId().equals(user.getId()) && !booking.getItem().getOwnerId().equals(user.getId())) {
+            throw new ResourceNotFoundException("Просмотр доступен только арендатору или владельцу");
+        }
+        return booking;
+    }
+
+    @Override
+    @Transactional
     public Booking updateBooking(Long ownerId, Long bookingId, Boolean approved) {
         log.debug("Обработка запроса на изменение статуса бронирования id={} от пользователя={}",
                 bookingId, ownerId);
@@ -65,9 +86,13 @@ public class BookingServiceImpl implements BookingService {
         User owner = userService.getUser(ownerId);
 
         if (!booking.getItem().getOwnerId().equals(owner.getId())) {
-            throw new PermissionDeniedException(
+            throw new ResourceNotFoundException(
                     String.format("Только владелец=%d вещи=%d может изменять статус бронирования=%d",
-                    booking.getItem().getOwnerId(), booking.getItem().getId(), booking.getId()));
+                            booking.getItem().getOwnerId(), booking.getItem().getId(), booking.getId()));
+        }
+
+        if (booking.getStatus() != BookingStatus.WAITING) {
+            throw new ResourceValidationException("Статус бронирования уже был изменён.");
         }
 
         Booking bookingForUpdate = booking.toBuilder()
@@ -76,4 +101,129 @@ public class BookingServiceImpl implements BookingService {
 
         return bookingRepository.save(bookingForUpdate);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Booking> getAllUserBookingsByState(Long userId, String state) {
+        log.debug("Обработка запроса на просмотр всех бронирований состояния:{} пользователя с id={}", state, userId);
+        userService.getUser(userId);
+        List<Booking> bookingsByState;
+        BookingState stateValue;
+
+        try {
+            stateValue = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new ResourceValidationException(String.format("Unknown state: %s", state));
+        }
+
+        switch (stateValue) {
+            case ALL:
+                bookingsByState = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                break;
+            case CURRENT:
+                bookingsByState = bookingRepository
+                        .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(userId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookingsByState = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId,
+                        LocalDateTime.now());
+                break;
+            case PAST:
+                bookingsByState = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId,
+                        LocalDateTime.now());
+                break;
+            case WAITING:
+                bookingsByState = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
+                        BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookingsByState = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
+                        BookingStatus.REJECTED);
+                break;
+            default:
+                return Collections.emptyList();
+        }
+        return bookingsByState;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<Booking> getAllOwnerBookingsByState(Long ownerId, String state) {
+        log.debug("Обработка запроса на просмотр всех бронирований состояния:{} владельца с id={}", state, ownerId);
+        userService.getUser(ownerId);
+        List<Booking> bookingsByState;
+        BookingState stateValue;
+
+        try {
+            stateValue = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new ResourceValidationException(String.format("Unknown state: %s", state));
+        }
+
+        switch (stateValue) {
+            case ALL:
+                bookingsByState = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
+                break;
+            case CURRENT:
+                bookingsByState = bookingRepository
+                        .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(
+                                ownerId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookingsByState = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
+                        ownerId,
+                        LocalDateTime.now());
+                break;
+            case PAST:
+                bookingsByState = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId,
+                        LocalDateTime.now());
+                break;
+            case WAITING:
+                bookingsByState = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId,
+                        BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookingsByState = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId,
+                        BookingStatus.REJECTED);
+                break;
+            default:
+                return Collections.emptyList();
+        }
+        return bookingsByState;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Booking> getAllByItemIdAndStatus(Long itemId, BookingStatus status) {
+        itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
+        return bookingRepository.findByItemIdAndStatus(itemId, status);
+    }
+
+    @Override
+    public ShortBookingDto getLastBooking(Long itemId) {
+        TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
+                .filter(b -> b.getEnd().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getEnd))));
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        return BookingMapper.toShortBookingDto(bookings.last());
+    }
+
+    @Override
+    public ShortBookingDto getNextBooking(Long itemId) {
+        TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
+                .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getStart))));
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        return BookingMapper.toShortBookingDto(bookings.first());
+    }
 }
+

@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.OwnerItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.util.Header;
@@ -36,15 +37,15 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) {
+    public OwnerItemDto getItem(@PathVariable Long itemId, @RequestHeader(Header.USER_ID) Long userId) {
         log.info("Получен запрос на просмотр вещи c id={}", itemId);
-        return ItemMapper.toItemDto(itemService.getItem(itemId));
+        return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
-    public Collection<ItemDto> getAllItems(@RequestHeader(Header.USER_ID) Long ownerId) {
+    public Collection<OwnerItemDto> getAllItems(@RequestHeader(Header.USER_ID) Long ownerId) {
         log.info("Получен запрос на просмотр всех вещей пользователя id={}", ownerId);
-        return itemService.getAllItems(ownerId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemService.getAllItems(ownerId);
     }
 
     @PatchMapping("/{itemId}")

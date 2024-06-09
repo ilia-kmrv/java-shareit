@@ -21,6 +21,15 @@ public class BookingMapper {
                 .build();
     }
 
+    public static ShortBookingDto toShortBookingDto(Booking booking) {
+        return ShortBookingDto.builder()
+                .id(booking.getId())
+                .bookerId(booking.getBooker().getId())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .build();
+    }
+
     public static Booking toBooking(InputBookingDto inputBookingDto, Item item, User user, BookingStatus status) {
         return Booking.builder()
                 .id(inputBookingDto.getId())
