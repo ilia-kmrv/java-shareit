@@ -7,7 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.PermissionDeniedException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
+import ru.practicum.shareit.exception.ResourceValidationException;
+import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.OwnerItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -15,8 +19,10 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.Util;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +31,8 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+
     private final UserService userService;
     private final BookingService bookingService;
 
@@ -40,18 +48,23 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public OwnerItemDto getItem(Long itemId, Long userId) {
-        log.debug("Обработка запроса на получение вещи");
+        log.debug("Обработка запроса на получение вещи c id={}", itemId);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
         User user = userService.getUser(userId);
 
+        List<CommentDto> comments = commentRepository.findAllByItemId(item.getId()).stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
         if (!item.getOwnerId().equals(user.getId())) {
-            return ItemMapper.toOwnerItemDto(item, null, null);
+            return ItemMapper.toOwnerItemDto(item, null, null, comments);
         }
 
         return ItemMapper.toOwnerItemDto(item,
                 bookingService.getLastBooking(itemId),
-                bookingService.getNextBooking(itemId));
+                bookingService.getNextBooking(itemId),
+                comments);
     }
 
     @Override
@@ -62,7 +75,8 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByOwnerId(ownerId).stream()
                 .map(i -> ItemMapper.toOwnerItemDto(i,
                         bookingService.getLastBooking(i.getId()),
-                        bookingService.getNextBooking(i.getId())))
+                        bookingService.getNextBooking(i.getId()),
+                        Collections.emptyList()))
                 .collect(Collectors.toList());
     }
 
@@ -106,5 +120,22 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         return itemRepository.search(text);
+    }
+
+    @Override
+    @Transactional
+    public CommentDto addComment(CommentDto commentDto, Long itemId, Long userId) {
+        log.debug("Обработка запроса на добавление комментария на вещь={} от пользователя={}", itemId, userId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
+        User user = userService.getUser(userId);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (item.getOwnerId().equals(user.getId())
+                || bookingService.getPastUserBookings(itemId, userId, now).isEmpty()) {
+            throw new ResourceValidationException("Комментарий может оставлять только пользователь завершивший аренду");
+        }
+
+        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, item, user)));
     }
 }

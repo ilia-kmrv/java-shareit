@@ -168,7 +168,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
-                        .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(
+                        .findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(
                                 ownerId,
                                 LocalDateTime.now(),
                                 LocalDateTime.now());
@@ -206,8 +206,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public ShortBookingDto getLastBooking(Long itemId) {
+        LocalDateTime now = LocalDateTime.now();
         TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
-                .filter(b -> b.getEnd().isBefore(LocalDateTime.now()))
+                .filter(b -> b.getEnd().isBefore(now) ||
+                        (b.getStart().isBefore(now) && b.getEnd().isAfter(now)))
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getEnd))));
         if (bookings.isEmpty()) {
             return null;
@@ -217,13 +219,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public ShortBookingDto getNextBooking(Long itemId) {
+        LocalDateTime now = LocalDateTime.now();
         TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
-                .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                .filter(b -> b.getStart().isAfter(now))
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getStart))));
         if (bookings.isEmpty()) {
             return null;
         }
         return BookingMapper.toShortBookingDto(bookings.first());
+    }
+
+    @Override
+    public Collection<Booking> getPastUserBookings(Long itemId, Long userId, LocalDateTime now) {
+        itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
+        userService.getUser(userId);
+        return bookingRepository.findByItemIdAndBookerIdAndEndBefore(itemId, userId, now);
     }
 }
 

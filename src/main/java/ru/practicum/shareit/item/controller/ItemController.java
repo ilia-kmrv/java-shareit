@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.OwnerItemDto;
@@ -68,6 +69,14 @@ public class ItemController {
     public Collection<ItemDto> searchItems(@RequestParam String text) {
         log.info("Получен запрос на поиск доступных вещей по тексту text={}", text);
         return itemService.searchItems(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto postComment(@Valid @RequestBody CommentDto commentDto,
+                                  @PathVariable Long itemId,
+                                  @RequestHeader(Header.USER_ID) Long userId) {
+        log.info("Получен запрос на добавление комментария к вещи={} от пользователя={}", itemId, userId);
+        return itemService.addComment(commentDto, itemId, userId);
     }
 
 }
