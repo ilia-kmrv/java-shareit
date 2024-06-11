@@ -17,6 +17,7 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.util.Util;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,7 +50,8 @@ public class BookingServiceImpl implements BookingService {
             throw new ResourceNotFoundException("Нельзя бронировать собственную вещь");
         }
 
-        if (inputBookingDto.getEnd().isBefore(inputBookingDto.getStart()) || inputBookingDto.getStart().isEqual(inputBookingDto.getEnd())) {
+        if (inputBookingDto.getEnd().isBefore(inputBookingDto.getStart())
+                || inputBookingDto.getStart().isEqual(inputBookingDto.getEnd())) {
             throw new ResourceValidationException("Некорректное время бронирования");
         }
 
@@ -122,17 +124,18 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
+
                         .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(userId,
-                                LocalDateTime.now(),
-                                LocalDateTime.now());
+                                Util.now(),
+                                Util.now());
                 break;
             case FUTURE:
                 bookingsByState = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId,
-                        LocalDateTime.now());
+                        Util.now());
                 break;
             case PAST:
                 bookingsByState = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId,
-                        LocalDateTime.now());
+                        Util.now());
                 break;
             case WAITING:
                 bookingsByState = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
@@ -168,19 +171,15 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
-                        .findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(
-                                ownerId,
-                                LocalDateTime.now(),
-                                LocalDateTime.now());
+                        .findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(ownerId,
+                                Util.now(),
+                                Util.now());
                 break;
             case FUTURE:
-                bookingsByState = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
-                        ownerId,
-                        LocalDateTime.now());
+                bookingsByState = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, Util.now());
                 break;
             case PAST:
-                bookingsByState = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId,
-                        LocalDateTime.now());
+                bookingsByState = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, Util.now());
                 break;
             case WAITING:
                 bookingsByState = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId,
@@ -206,10 +205,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public ShortBookingDto getLastBooking(Long itemId) {
-        LocalDateTime now = LocalDateTime.now();
         TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
-                .filter(b -> b.getEnd().isBefore(now) ||
-                        (b.getStart().isBefore(now) && b.getEnd().isAfter(now)))
+                .filter(b -> b.getEnd().isBefore(Util.now())
+                        || (b.getStart().isBefore(Util.now()) && b.getEnd().isAfter(Util.now())))
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getEnd))));
         if (bookings.isEmpty()) {
             return null;
@@ -219,9 +217,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public ShortBookingDto getNextBooking(Long itemId) {
-        LocalDateTime now = LocalDateTime.now();
         TreeSet<Booking> bookings = getAllByItemIdAndStatus(itemId, BookingStatus.APPROVED).stream()
-                .filter(b -> b.getStart().isAfter(now))
+                .filter(b -> b.getStart().isAfter(Util.now()))
                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Booking::getStart))));
         if (bookings.isEmpty()) {
             return null;

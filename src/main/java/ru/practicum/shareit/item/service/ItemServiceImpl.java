@@ -19,7 +19,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.Util;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -129,10 +128,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
         User user = userService.getUser(userId);
-        LocalDateTime now = LocalDateTime.now();
 
         if (item.getOwnerId().equals(user.getId())
-                || bookingService.getPastUserBookings(itemId, userId, now).isEmpty()) {
+                || bookingService.getPastUserBookings(itemId, userId, Util.now()).isEmpty()) {
             throw new ResourceValidationException("Комментарий может оставлять только пользователь завершивший аренду");
         }
 
