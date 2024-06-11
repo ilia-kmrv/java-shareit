@@ -234,4 +234,3 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByItemIdAndBookerIdAndEndBefore(itemId, userId, now);
     }
 }
-

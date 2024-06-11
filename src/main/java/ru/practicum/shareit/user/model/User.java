@@ -5,10 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-/**
- * TODO Sprint add-controllers.
- */
-
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
