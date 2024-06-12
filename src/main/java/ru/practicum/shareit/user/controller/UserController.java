@@ -15,9 +15,6 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @Slf4j
 @RequestMapping(path = "/users")
