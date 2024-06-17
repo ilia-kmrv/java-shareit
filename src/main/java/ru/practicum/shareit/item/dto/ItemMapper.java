@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.ShortBookingDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import java.util.List;
 
@@ -42,6 +43,15 @@ public class ItemMapper {
                 .available(itemDto.getAvailable())
                 .ownerId(itemDto.getOwnerId())
                 .requestId(itemDto.getRequestId())
+                .build();
+    }
+
+    public static ItemDtoForRequest toItemDtoForRequest(Item item) {
+        return ItemDtoForRequest.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .requestId(item.getRequestId())
                 .build();
     }
 }
