@@ -124,7 +124,6 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
-
                         .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(userId,
                                 Util.now(),
                                 Util.now());

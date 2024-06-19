@@ -12,6 +12,8 @@ import ru.practicum.shareit.util.Header;
 import ru.practicum.shareit.validation.OnCreate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
 
@@ -36,5 +39,20 @@ public class ItemRequestController {
     public List<ItemRequestDtoWithItems> getRequestsByUser(@RequestHeader(Header.USER_ID) Long userId){
         log.info("Получен запрос на просмотр запросов от пользователя с id={}", userId);
         return itemRequestService.getRequestsByUserId(userId);
+    }
+
+    @GetMapping("/all")
+    public List<ItemRequestDtoWithItems> getAllRequests(@RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                        @RequestParam(defaultValue = "10") @Positive Integer size,
+                                                        @RequestHeader(Header.USER_ID) Long userId) {
+        log.info("Просмотр запросов от {} размером {} от пользователя с id={}", from, size, userId);
+        return itemRequestService.getAllRequests(from, size, userId);
+    }
+
+    @GetMapping("/{requestId}")
+    public ItemRequestDtoWithItems getRequest(@PathVariable Long requestId,
+                                              @RequestHeader(Header.USER_ID) Long userId) {
+        log.info("Просмотр запроса по id={} от пользователя id={}", requestId, userId);
+        return itemRequestService.getRequest(requestId, userId);
     }
 }
