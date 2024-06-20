@@ -18,9 +18,9 @@ public interface BookingService {
 
     Booking updateBooking(Long ownerId, Long bookingId, Boolean approved);
 
-    Collection<Booking> getAllUserBookingsByState(Long userId, String state);
+    Collection<Booking> getAllUserBookingsByState(Long userId, String state, Integer from, Integer size);
 
-    Collection<Booking> getAllOwnerBookingsByState(Long ownerId, String state);
+    Collection<Booking> getAllOwnerBookingsByState(Long ownerId, String state, Integer from, Integer size);
 
     Collection<Booking> getAllByItemIdAndStatus(Long itemId, BookingStatus status);
 

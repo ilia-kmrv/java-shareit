@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -68,10 +69,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<OwnerItemDto> getAllItems(Long ownerId) {
+    public Collection<OwnerItemDto> getAllItems(Long ownerId, Integer from, Integer size) {
         log.debug("Обработка запроса на получение всех вещей пользователя  id={}", ownerId);
         userService.getUser(ownerId);
-        return itemRepository.findByOwnerId(ownerId).stream()
+        Pageable page = Util.page(from, size);
+        return itemRepository.findByOwnerId(ownerId, page).stream()
                 .map(i -> ItemMapper.toOwnerItemDto(i,
                         bookingService.getLastBooking(i.getId()),
                         bookingService.getNextBooking(i.getId()),
@@ -113,12 +115,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Item> searchItems(String text) {
+    public Collection<Item> searchItems(String text, Integer from, Integer size) {
         log.debug("Обработка запроса на поиск доступных вещей по тексту text={}", text);
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text);
+        Pageable page = Util.page(from, size);
+        return itemRepository.search(text, page);
     }
 
     @Override

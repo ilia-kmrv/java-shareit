@@ -36,7 +36,7 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<ItemRequestDtoWithItems> getRequestsByUser(@RequestHeader(Header.USER_ID) Long userId){
+    public List<ItemRequestDtoWithItems> getRequestsByUser(@RequestHeader(Header.USER_ID) Long userId) {
         log.info("Получен запрос на просмотр запросов от пользователя с id={}", userId);
         return itemRequestService.getRequestsByUserId(userId);
     }

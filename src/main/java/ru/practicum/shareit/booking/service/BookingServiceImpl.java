@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -106,11 +107,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Booking> getAllUserBookingsByState(Long userId, String state) {
+    public Collection<Booking> getAllUserBookingsByState(Long userId, String state, Integer from, Integer size) {
         log.debug("Обработка запроса на просмотр всех бронирований состояния:{} пользователя с id={}", state, userId);
         userService.getUser(userId);
         List<Booking> bookingsByState;
         BookingState stateValue;
+        Pageable page = Util.page(from, size);
 
         try {
             stateValue = BookingState.valueOf(state);
@@ -120,29 +122,34 @@ public class BookingServiceImpl implements BookingService {
 
         switch (stateValue) {
             case ALL:
-                bookingsByState = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                bookingsByState = bookingRepository.findByBookerIdOrderByStartDesc(userId, page);
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
                         .findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(userId,
                                 Util.now(),
-                                Util.now());
+                                Util.now(),
+                                page);
                 break;
             case FUTURE:
                 bookingsByState = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId,
-                        Util.now());
+                        Util.now(),
+                        page);
                 break;
             case PAST:
                 bookingsByState = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId,
-                        Util.now());
+                        Util.now(),
+                        page);
                 break;
             case WAITING:
                 bookingsByState = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING,
+                        page);
                 break;
             case REJECTED:
                 bookingsByState = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED,
+                        page);
                 break;
             default:
                 return Collections.emptyList();
@@ -152,11 +159,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<Booking> getAllOwnerBookingsByState(Long ownerId, String state) {
+    public Collection<Booking> getAllOwnerBookingsByState(Long ownerId, String state, Integer from, Integer size) {
         log.debug("Обработка запроса на просмотр всех бронирований состояния:{} владельца с id={}", state, ownerId);
         userService.getUser(ownerId);
         List<Booking> bookingsByState;
         BookingState stateValue;
+        Pageable page = Util.page(from, size);
 
         try {
             stateValue = BookingState.valueOf(state);
@@ -166,27 +174,34 @@ public class BookingServiceImpl implements BookingService {
 
         switch (stateValue) {
             case ALL:
-                bookingsByState = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
+                bookingsByState = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, page);
                 break;
             case CURRENT:
                 bookingsByState = bookingRepository
                         .findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqualOrderByStartDesc(ownerId,
                                 Util.now(),
-                                Util.now());
+                                Util.now(),
+                                page);
                 break;
             case FUTURE:
-                bookingsByState = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, Util.now());
+                bookingsByState = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId,
+                        Util.now(),
+                        page);
                 break;
             case PAST:
-                bookingsByState = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, Util.now());
+                bookingsByState = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId,
+                        Util.now(),
+                        page);
                 break;
             case WAITING:
                 bookingsByState = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING,
+                        page);
                 break;
             case REJECTED:
                 bookingsByState = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED,
+                        page);
                 break;
             default:
                 return Collections.emptyList();
