@@ -241,10 +241,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<Booking> getPastUserBookings(Long itemId, Long userId, LocalDateTime now) {
+    public Collection<Booking> getPastUserBookings(Long itemId, Long userId) {
         itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Вещь с id=%d не найдена", itemId)));
         userService.getUser(userId);
-        return bookingRepository.findByItemIdAndBookerIdAndEndBefore(itemId, userId, now);
+        return bookingRepository.findByItemIdAndBookerIdAndEndBefore(itemId, userId, Util.now());
     }
 }
