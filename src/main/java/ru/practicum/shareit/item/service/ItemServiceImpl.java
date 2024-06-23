@@ -133,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
         User user = userService.getUser(userId);
 
         if (item.getOwnerId().equals(user.getId())
-                || bookingService.getPastUserBookings(itemId, userId, Util.now()).isEmpty()) {
+                || bookingService.getPastUserBookings(itemId, userId).isEmpty()) {
             throw new ResourceValidationException("Комментарий может оставлять только пользователь завершивший аренду");
         }
 

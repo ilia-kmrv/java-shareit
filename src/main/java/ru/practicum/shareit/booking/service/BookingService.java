@@ -28,5 +28,5 @@ public interface BookingService {
 
     ShortBookingDto getNextBooking(Long itemId);
 
-    Collection<Booking> getPastUserBookings(Long itemId, Long userId, LocalDateTime now);
+    Collection<Booking> getPastUserBookings(Long itemId, Long userId);
 }
