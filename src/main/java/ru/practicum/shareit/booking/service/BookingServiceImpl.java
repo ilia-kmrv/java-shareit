@@ -20,7 +20,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.Util;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
