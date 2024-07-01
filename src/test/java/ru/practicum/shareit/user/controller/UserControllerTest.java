@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserControllerIT {
+class UserControllerTest {
 
     private final ObjectMapper mapper;
 
@@ -156,13 +156,37 @@ class UserControllerIT {
 
     @SneakyThrows
     @Test
+    void patchUser_whenInvoked_thenStatusIsOkAndServiceMethodCalled() {
+        Long userId = 0L;
+        UserDto dto = UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
+        when(userService.updateUser(any(), anyLong())).thenReturn(user);
+
+        String result = mvc.perform(patch("/users/{userId}", userId)
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(mapper.writeValueAsString(user), result);
+    }
+
+    @SneakyThrows
+    @Test
     void patchUser_whenUserDtoIsNotValid_thenStatusIsBadRequest() {
         Long userId = 0L;
         User userForUpdate = user.toBuilder().email("wrong-email.com").build();
 
         mvc.perform(patch("/users/{userId}", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(userForUpdate)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(userForUpdate)))
                 .andExpect(status().isBadRequest());
 
         verify(userService, never()).updateUser(userForUpdate, userId);
