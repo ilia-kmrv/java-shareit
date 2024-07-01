@@ -13,6 +13,8 @@ import ru.practicum.shareit.validation.OnCreate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -49,18 +51,22 @@ public class BookingController {
 
     @GetMapping
     public Collection<BookingDto> getAllUserBookings(@RequestHeader(Header.USER_ID) Long userId,
-                                                     @RequestParam(defaultValue = "ALL") String state) {
+                                                     @RequestParam(defaultValue = "ALL") String state,
+                                                     @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                     @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получен запрос на просмотр всех бронирований состояния:{} пользователя с id={}", state, userId);
-        return bookingService.getAllUserBookingsByState(userId, state).stream()
+        return bookingService.getAllUserBookingsByState(userId, state, from, size).stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/owner")
     public Collection<BookingDto> getAllOwnerBookings(@RequestHeader(Header.USER_ID) Long ownerId,
-                                                      @RequestParam(defaultValue = "ALL") String state) {
+                                                      @RequestParam(defaultValue = "ALL") String state,
+                                                      @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                                      @RequestParam(defaultValue = "10") @Positive Integer size) {
         log.info("Получен запрос на просмотр всех бронирований состояния:{} владельца с id={}", state, ownerId);
-        return bookingService.getAllOwnerBookingsByState(ownerId, state).stream()
+        return bookingService.getAllOwnerBookingsByState(ownerId, state, from, size).stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
