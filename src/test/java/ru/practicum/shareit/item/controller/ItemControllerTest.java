@@ -161,7 +161,7 @@ class ItemControllerTest {
         when(itemService.getItem(itemId, userId)).thenReturn(dto);
 
         mvc.perform(get("/items/{itemId}", itemId)
-                .header(Header.USER_ID, userId))
+                        .header(Header.USER_ID, userId))
                 .andExpect(status().isOk());
 
         verify(itemService).getItem(itemId, userId);

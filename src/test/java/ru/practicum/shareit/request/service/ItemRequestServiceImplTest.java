@@ -37,7 +37,6 @@ class ItemRequestServiceImplTest {
     @InjectMocks
     private ItemRequestServiceImpl requestService;
 
-
     @Test
     void addItemRequest_whenUserFoundThenReturnSavedRequest() {
         ItemRequestDto itemRequestDto = ItemRequestDto.builder().build();

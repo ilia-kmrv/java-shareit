@@ -33,7 +33,7 @@ class UserControllerTest {
     private final MockMvc mvc;
 
     @MockBean
-    private UserService userService;
+    private final UserService userService;
 
     User user;
 

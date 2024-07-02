@@ -109,10 +109,10 @@ class BookingControllerTest {
         when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
 
         String result = mvc.perform(post("/bookings")
-                .header(Header.USER_ID, userId)
-                .content(mapper.writeValueAsString(inputBookingDto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                        .header(Header.USER_ID, userId)
+                        .content(mapper.writeValueAsString(inputBookingDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -220,10 +220,28 @@ class BookingControllerTest {
         when(bookingService.getBookingByUserId(bookingId, userId)).thenReturn(booking);
 
         mvc.perform(get("/bookings/{bookingId}", bookingId)
-                .header(Header.USER_ID, userId))
+                        .header(Header.USER_ID, userId))
                 .andExpect(status().isOk());
 
         verify(bookingService).getBookingByUserId(bookingId, userId);
+    }
+
+    @SneakyThrows
+    @Test
+    void getAllUserBookings_whenInvoked_thenStatusIsOkAndServiceMethodCalled() {
+        Long userId = 0L;
+        String state = "ALL";
+        Integer from = 0;
+        Integer size = 10;
+
+        mvc.perform(get("/bookings")
+                        .header(Header.USER_ID, userId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk());
+
+        verify(bookingService).getAllUserBookingsByState(userId, state, from, size);
     }
 
     @SneakyThrows
@@ -235,10 +253,10 @@ class BookingControllerTest {
         Integer size = 10;
 
         mvc.perform(get("/bookings")
-                .header(Header.USER_ID, userId)
-                .param("state", state)
-                .param("from", String.valueOf(from))
-                .param("size", String.valueOf(size)))
+                        .header(Header.USER_ID, userId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
                 .andExpect(status().isBadRequest());
 
         verify(bookingService, never()).getAllUserBookingsByState(userId, state, from, size);
@@ -264,13 +282,31 @@ class BookingControllerTest {
 
     @SneakyThrows
     @Test
+    void getAllOwnerBookings_whenInvoked_thenStatusIsOkAndServiceMethodCalled() {
+        Long userId = 0L;
+        String state = "ALL";
+        Integer from = 0;
+        Integer size = 10;
+
+        mvc.perform(get("/bookings/owner")
+                        .header(Header.USER_ID, userId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk());
+
+        verify(bookingService).getAllOwnerBookingsByState(userId, state, from, size);
+    }
+
+    @SneakyThrows
+    @Test
     void getAllOwnerBookings_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
         Long userId = 0L;
         String state = "CURRENT";
         Integer from = -1;
         Integer size = 10;
 
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings/owner")
                         .header(Header.USER_ID, userId)
                         .param("state", state)
                         .param("from", String.valueOf(from))
@@ -288,7 +324,7 @@ class BookingControllerTest {
         Integer from = 1;
         Integer size = -10;
 
-        mvc.perform(get("/bookings")
+        mvc.perform(get("/bookings/owner")
                         .header(Header.USER_ID, userId)
                         .param("state", state)
                         .param("from", String.valueOf(from))
