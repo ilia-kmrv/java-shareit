@@ -86,7 +86,7 @@ class ItemRequestControllerTest {
     @Test
     void postItemRequest_whenDescriptionIsBlank_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
         Long userId = 0L;
-        itemRequestDto.setDescription(null);
+        itemRequestDto.setDescription(" ");
         when(itemRequestService.addItemRequest(itemRequestDto, userId)).thenReturn(itemRequest);
 
         mvc.perform(post("/requests")
