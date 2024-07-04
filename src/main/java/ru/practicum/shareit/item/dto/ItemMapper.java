@@ -44,4 +44,14 @@ public class ItemMapper {
                 .requestId(itemDto.getRequestId())
                 .build();
     }
+
+    public static ItemDtoForRequest toItemDtoForRequest(Item item) {
+        return ItemDtoForRequest.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequestId())
+                .build();
+    }
 }
