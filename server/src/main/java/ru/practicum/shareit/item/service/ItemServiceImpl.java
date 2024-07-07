@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Обработка запроса на получение всех вещей пользователя  id={}", ownerId);
         userService.getUser(ownerId);
         Pageable page = Util.page(from, size);
-        return itemRepository.findByOwnerId(ownerId, page).stream()
+        return itemRepository.findAllByOwnerIdOrderByIdAsc(ownerId, page).stream()
                 .map(i -> ItemMapper.toOwnerItemDto(i,
                         bookingService.getLastBooking(i.getId()),
                         bookingService.getNextBooking(i.getId()),

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    List<Item> findByOwnerId(Long ownerId, Pageable page);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long ownerId, Pageable page);
 
     @Query(" SELECT i FROM Item i " +
             "WHERE i.available = true " +

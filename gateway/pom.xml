@@ -9,6 +9,8 @@
     </parent>
 
     <artifactId>shareit-gateway</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ShareIt Gateway</name>
 
     <properties>
         <java.version>11</java.version>

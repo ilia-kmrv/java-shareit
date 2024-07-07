@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+//import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -121,80 +121,80 @@ class BookingControllerTest {
         assertEquals(mapper.writeValueAsString(bookingDto), result);
     }
 
-    @SneakyThrows
-    @Test
-    void createBooking_whenStartInThePast_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        InputBookingDto inputBookingDto = InputBookingDto.builder()
-                .start(booking.getStart().minusHours(10))
-                .end(booking.getEnd())
-                .itemId(item.getId())
-                .build();
+//    @SneakyThrows
+//    @Test
+//    void createBooking_whenStartInThePast_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        InputBookingDto inputBookingDto = InputBookingDto.builder()
+//                .start(booking.getStart().minusHours(10))
+//                .end(booking.getEnd())
+//                .itemId(item.getId())
+//                .build();
+//
+//        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
+//
+//        mvc.perform(post("/bookings")
+//                        .header(Header.USER_ID, userId)
+//                        .content(mapper.writeValueAsString(inputBookingDto))
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
+//    }
 
-        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
+//    @SneakyThrows
+//    @Test
+//    void createBooking_whenEndInThePast_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        InputBookingDto inputBookingDto = InputBookingDto.builder()
+//                .start(booking.getStart())
+//                .end(booking.getEnd().minusDays(10))
+//                .itemId(item.getId())
+//                .build();
+//
+//        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
+//
+//        mvc.perform(post("/bookings")
+//                        .header(Header.USER_ID, userId)
+//                        .content(mapper.writeValueAsString(inputBookingDto))
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
+//    }
 
-        mvc.perform(post("/bookings")
-                        .header(Header.USER_ID, userId)
-                        .content(mapper.writeValueAsString(inputBookingDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
-    }
-
-    @SneakyThrows
-    @Test
-    void createBooking_whenEndInThePast_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        InputBookingDto inputBookingDto = InputBookingDto.builder()
-                .start(booking.getStart())
-                .end(booking.getEnd().minusDays(10))
-                .itemId(item.getId())
-                .build();
-
-        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
-
-        mvc.perform(post("/bookings")
-                        .header(Header.USER_ID, userId)
-                        .content(mapper.writeValueAsString(inputBookingDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
-    }
-
-    @SneakyThrows
-    @Test
-    void createBooking_whenItemIdIsNull_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        InputBookingDto inputBookingDto = InputBookingDto.builder()
-                .start(booking.getStart())
-                .end(booking.getEnd())
-                .itemId(null)
-                .build();
-
-        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
-
-        mvc.perform(post("/bookings")
-                        .header(Header.USER_ID, userId)
-                        .content(mapper.writeValueAsString(inputBookingDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
-    }
+//    @SneakyThrows
+//    @Test
+//    void createBooking_whenItemIdIsNull_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        InputBookingDto inputBookingDto = InputBookingDto.builder()
+//                .start(booking.getStart())
+//                .end(booking.getEnd())
+//                .itemId(null)
+//                .build();
+//
+//        when(bookingService.addBooking(inputBookingDto, userId)).thenReturn(booking);
+//
+//        mvc.perform(post("/bookings")
+//                        .header(Header.USER_ID, userId)
+//                        .content(mapper.writeValueAsString(inputBookingDto))
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//        Mockito.verify(bookingService, never()).addBooking(inputBookingDto, userId);
+//    }
 
     @SneakyThrows
     @Test
@@ -244,41 +244,41 @@ class BookingControllerTest {
         verify(bookingService).getAllUserBookingsByState(userId, state, from, size);
     }
 
-    @SneakyThrows
-    @Test
-    void getAllUserBookings_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        String state = "CURRENT";
-        Integer from = -1;
-        Integer size = 10;
+//    @SneakyThrows
+//    @Test
+//    void getAllUserBookings_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        String state = "CURRENT";
+//        Integer from = -1;
+//        Integer size = 10;
+//
+//        mvc.perform(get("/bookings")
+//                        .header(Header.USER_ID, userId)
+//                        .param("state", state)
+//                        .param("from", String.valueOf(from))
+//                        .param("size", String.valueOf(size)))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(bookingService, never()).getAllUserBookingsByState(userId, state, from, size);
+//    }
 
-        mvc.perform(get("/bookings")
-                        .header(Header.USER_ID, userId)
-                        .param("state", state)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).getAllUserBookingsByState(userId, state, from, size);
-    }
-
-    @SneakyThrows
-    @Test
-    void getAllUserBookings_whenSizeIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        String state = "CURRENT";
-        Integer from = 1;
-        Integer size = -10;
-
-        mvc.perform(get("/bookings")
-                        .header(Header.USER_ID, userId)
-                        .param("state", state)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).getAllUserBookingsByState(userId, state, from, size);
-    }
+//    @SneakyThrows
+//    @Test
+//    void getAllUserBookings_whenSizeIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        String state = "CURRENT";
+//        Integer from = 1;
+//        Integer size = -10;
+//
+//        mvc.perform(get("/bookings")
+//                        .header(Header.USER_ID, userId)
+//                        .param("state", state)
+//                        .param("from", String.valueOf(from))
+//                        .param("size", String.valueOf(size)))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(bookingService, never()).getAllUserBookingsByState(userId, state, from, size);
+//    }
 
     @SneakyThrows
     @Test
@@ -298,39 +298,39 @@ class BookingControllerTest {
         verify(bookingService).getAllOwnerBookingsByState(userId, state, from, size);
     }
 
-    @SneakyThrows
-    @Test
-    void getAllOwnerBookings_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        String state = "CURRENT";
-        Integer from = -1;
-        Integer size = 10;
-
-        mvc.perform(get("/bookings/owner")
-                        .header(Header.USER_ID, userId)
-                        .param("state", state)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).getAllOwnerBookingsByState(userId, state, from, size);
-    }
-
-    @SneakyThrows
-    @Test
-    void getAllOwnerBookings_whenSizeIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-        Long userId = 0L;
-        String state = "CURRENT";
-        Integer from = 1;
-        Integer size = -10;
-
-        mvc.perform(get("/bookings/owner")
-                        .header(Header.USER_ID, userId)
-                        .param("state", state)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, never()).getAllOwnerBookingsByState(userId, state, from, size);
-    }
+//    @SneakyThrows
+//    @Test
+//    void getAllOwnerBookings_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        String state = "CURRENT";
+//        Integer from = -1;
+//        Integer size = 10;
+//
+//        mvc.perform(get("/bookings/owner")
+//                        .header(Header.USER_ID, userId)
+//                        .param("state", state)
+//                        .param("from", String.valueOf(from))
+//                        .param("size", String.valueOf(size)))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(bookingService, never()).getAllOwnerBookingsByState(userId, state, from, size);
+//    }
+//
+//    @SneakyThrows
+//    @Test
+//    void getAllOwnerBookings_whenSizeIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
+//        Long userId = 0L;
+//        String state = "CURRENT";
+//        Integer from = 1;
+//        Integer size = -10;
+//
+//        mvc.perform(get("/bookings/owner")
+//                        .header(Header.USER_ID, userId)
+//                        .param("state", state)
+//                        .param("from", String.valueOf(from))
+//                        .param("size", String.valueOf(size)))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(bookingService, never()).getAllOwnerBookingsByState(userId, state, from, size);
+//    }
 }

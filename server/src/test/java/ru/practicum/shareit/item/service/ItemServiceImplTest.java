@@ -111,7 +111,7 @@ class ItemServiceImplTest {
         List<Item> items = List.of(item);
         List<OwnerItemDto> dto = List.of(ownerItemDto);
         Pageable page = Util.page(from, size);
-        when(itemRepository.findByOwnerId(ownerId, page)).thenReturn(items);
+        when(itemRepository.findAllByOwnerIdOrderByIdAsc(ownerId, page)).thenReturn(items);
 
         Collection<OwnerItemDto> actualDto = itemService.getAllItems(ownerId, from, size);
 

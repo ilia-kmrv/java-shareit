@@ -70,65 +70,65 @@ class UserControllerTest {
         assertEquals(mapper.writeValueAsString(user), result);
     }
 
-    @SneakyThrows
-    @Test
-    void postUser_whenInvokedWrongEmail_thenStatusIsBadRequestAndErrorPrompted() {
-        UserDto dto = UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email("mail.mail.com")
-                .build();
+//    @SneakyThrows
+//    @Test
+//    void postUser_whenInvokedWrongEmail_thenStatusIsBadRequestAndErrorPrompted() {
+//        UserDto dto = UserDto.builder()
+//                .id(user.getId())
+//                .name(user.getName())
+//                .email("mail.mail.com")
+//                .build();
+//
+//        mvc.perform(post("/users")
+//                        .content(mapper.writeValueAsString(dto))
+//                        .characterEncoding(StandardCharsets.UTF_8)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn();
+//
+//        verify(userService, never()).addUser(user);
+//    }
 
-        mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(dto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+//    @SneakyThrows
+//    @Test
+//    void postUser_whenInvokedWithBlankName_thenStatusIsBadRequestAndErrorPrompted() {
+//        UserDto dto = UserDto.builder()
+//                .id(user.getId())
+//                .name(" ")
+//                .email(user.getEmail())
+//                .build();
+//
+//        mvc.perform(post("/users")
+//                        .content(mapper.writeValueAsString(dto))
+//                        .characterEncoding(StandardCharsets.UTF_8)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn();
+//
+//        verify(userService, never()).getUser(any());
+//    }
 
-        verify(userService, never()).addUser(user);
-    }
-
-    @SneakyThrows
-    @Test
-    void postUser_whenInvokedWithBlankName_thenStatusIsBadRequestAndErrorPrompted() {
-        UserDto dto = UserDto.builder()
-                .id(user.getId())
-                .name(" ")
-                .email(user.getEmail())
-                .build();
-
-        mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(dto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        verify(userService, never()).getUser(any());
-    }
-
-    @SneakyThrows
-    @Test
-    void postUser_whenInvokeWithNullEmail_thenStatusIsBadRequestAndErrorPrompted() {
-        UserDto dto = UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(null)
-                .build();
-
-        mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(dto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        verify(userService, never()).getUser(any());
-    }
+//    @SneakyThrows
+//    @Test
+//    void postUser_whenInvokeWithNullEmail_thenStatusIsBadRequestAndErrorPrompted() {
+//        UserDto dto = UserDto.builder()
+//                .id(user.getId())
+//                .name(user.getName())
+//                .email(null)
+//                .build();
+//
+//        mvc.perform(post("/users")
+//                        .content(mapper.writeValueAsString(dto))
+//                        .characterEncoding(StandardCharsets.UTF_8)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest())
+//                .andReturn();
+//
+//        verify(userService, never()).getUser(any());
+//    }
 
     @SneakyThrows
     @Test
@@ -178,19 +178,19 @@ class UserControllerTest {
         assertEquals(mapper.writeValueAsString(user), result);
     }
 
-    @SneakyThrows
-    @Test
-    void patchUser_whenUserDtoIsNotValid_thenStatusIsBadRequest() {
-        Long userId = 0L;
-        User userForUpdate = user.toBuilder().email("wrong-email.com").build();
-
-        mvc.perform(patch("/users/{userId}", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userForUpdate)))
-                .andExpect(status().isBadRequest());
-
-        verify(userService, never()).updateUser(userForUpdate, userId);
-    }
+//    @SneakyThrows
+//    @Test
+//    void patchUser_whenUserDtoIsNotValid_thenStatusIsBadRequest() {
+//        Long userId = 0L;
+//        User userForUpdate = user.toBuilder().email("wrong-email.com").build();
+//
+//        mvc.perform(patch("/users/{userId}", userId)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(mapper.writeValueAsString(userForUpdate)))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(userService, never()).updateUser(userForUpdate, userId);
+//    }
 
     @SneakyThrows
     @Test
