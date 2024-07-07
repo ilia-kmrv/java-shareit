@@ -80,78 +80,6 @@ class ItemControllerTest {
         assertEquals(mapper.writeValueAsString(item), result);
     }
 
-//    @SneakyThrows
-//    @Test
-//    void postItem_whenItemDtoHasBlankName_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        ItemDto dto = ItemDto.builder()
-//                .id(item.getId())
-//                .name(" ")
-//                .description(item.getDescription())
-//                .available(item.getAvailable())
-//                .ownerId(item.getOwnerId())
-//                .requestId(item.getRequestId())
-//                .build();
-//        Long ownerId = 0L;
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(dto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(Header.USER_ID, ownerId))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).addItem(item, ownerId);
-//    }
-
-//    @SneakyThrows
-//    @Test
-//    void postItem_whenItemDtoHasBlankDescription_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        ItemDto dto = ItemDto.builder()
-//                .id(item.getId())
-//                .name(item.getName())
-//                .description(" ")
-//                .available(item.getAvailable())
-//                .ownerId(item.getOwnerId())
-//                .requestId(item.getRequestId())
-//                .build();
-//        Long ownerId = 0L;
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(dto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(Header.USER_ID, ownerId))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).addItem(item, ownerId);
-//    }
-
-//    @SneakyThrows
-//    @Test
-//    void postItem_whenItemDtoAvailableIsNull_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        ItemDto dto = ItemDto.builder()
-//                .id(item.getId())
-//                .name(item.getName())
-//                .description(item.getDescription())
-//                .available(null)
-//                .ownerId(item.getOwnerId())
-//                .requestId(item.getRequestId())
-//                .build();
-//        Long ownerId = 0L;
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(dto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(Header.USER_ID, ownerId))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).addItem(item, ownerId);
-//    }
-
     @SneakyThrows
     @Test
     void getItem_whenInvoked_StatusIsOkAndServiceMethodCalled() {
@@ -183,40 +111,6 @@ class ItemControllerTest {
 
         verify(itemService).getAllItems(userId, from, size);
     }
-
-//    @SneakyThrows
-//    @Test
-//    void getAllItems_whenFromIsNegative_thenStatusIsAndServiceMethodCalledWithDefaultValues() {
-//        Long userId = 0L;
-//        Integer from = -1;
-//        Integer size = 10;
-//        when(itemService.getAllItems(userId, from, size)).thenReturn(List.of());
-//
-//        mvc.perform(get("/items")
-//                        .header(Header.USER_ID, userId)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).getAllItems(userId, from, size);
-//    }
-
-//    @SneakyThrows
-//    @Test
-//    void getAllItems_whenSizeIsNegative_thenStatusIsAndServiceMethodCalledWithDefaultValues() {
-//        Long userId = 0L;
-//        Integer from = 0;
-//        Integer size = -10;
-//        when(itemService.getAllItems(userId, from, size)).thenReturn(List.of());
-//
-//        mvc.perform(get("/items")
-//                        .header(Header.USER_ID, userId)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).getAllItems(userId, from, size);
-//    }
 
     @SneakyThrows
     @Test
@@ -279,40 +173,6 @@ class ItemControllerTest {
         verify(itemService).searchItems(text, from, size);
     }
 
-//    @SneakyThrows
-//    @Test
-//    void searchItems_whenFromIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        String text = "search";
-//        Integer from = -1;
-//        Integer size = 10;
-//        when(itemService.searchItems(text, from, size)).thenReturn(List.of());
-//
-//        mvc.perform(get("/items/search")
-//                        .param("text", text)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).searchItems(text, from, size);
-//    }
-
-//    @SneakyThrows
-//    @Test
-//    void searchItems_whenSizeIsNegative_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        String text = "search";
-//        Integer from = 0;
-//        Integer size = -10;
-//        when(itemService.searchItems(text, from, size)).thenReturn(List.of());
-//
-//        mvc.perform(get("/items/search")
-//                        .param("text", text)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never()).searchItems(text, from, size);
-//    }
-
     @SneakyThrows
     @Test
     void postComment_whenInvoked_thenStatusIsOkAndCommentDtoReturned() {
@@ -335,25 +195,4 @@ class ItemControllerTest {
         assertEquals(mapper.writeValueAsString(commentDto), result);
     }
 
-//    @SneakyThrows
-//    @Test
-//    void postComment_whenCommentTextIsBlank_thenStatusIsBadRequestAndServiceMethodNeverCalled() {
-//        CommentDto commentDto = CommentDto.builder().build();
-//        Long userId = 0L;
-//        Long itemId = 0L;
-//        when(itemService.addComment(commentDto, itemId, userId)).thenReturn(commentDto);
-//
-//        mvc.perform(post("/items/{itemId}/comment", itemId)
-//                        .content(mapper.writeValueAsString(commentDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(Header.USER_ID, userId))
-//                .andExpect(status().isBadRequest())
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString();
-//
-//        verify(itemService, never()).addComment(commentDto, itemId, userId);
-//    }
 }

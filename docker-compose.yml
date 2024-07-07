@@ -28,7 +28,7 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-      - "TZ=Europe/Moscow"
+#      - "TZ=Europe/Moscow"
       - DB_NAME=shareit
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
