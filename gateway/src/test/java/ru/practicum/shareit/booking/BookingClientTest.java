@@ -20,7 +20,6 @@ import ru.practicum.shareit.booking.dto.InputBookingDto;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -52,33 +51,40 @@ class BookingClientTest {
 
     @Test
     void createBooking_whenInvoked_thenStatusIsOk() {
+        long userId = 0L;
+        InputBookingDto inputBookingDto = InputBookingDto.builder().build();
         this.server.expect(requestTo(serverUrl + "/bookings"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(bookingDtoString, MediaType.APPLICATION_JSON));
 
-        ResponseEntity dto = this.bookingClient.createBooking(anyLong(), any());
+        ResponseEntity dto = this.bookingClient.createBooking(userId, inputBookingDto);
 
         assertTrue(dto.getStatusCode().is2xxSuccessful());
     }
 
     @Test
     void changeBookingStatus_whenInvoked_thenStatusIsOk() {
+        long userId = 0L;
+        long bookingId = 0L;
+        boolean approved = false;
         this.server.expect(requestTo(serverUrl + "/bookings/0?approved=false"))
                 .andExpect(method(HttpMethod.PATCH))
                 .andRespond(withSuccess(bookingDtoString, MediaType.APPLICATION_JSON));
 
-        ResponseEntity dto = this.bookingClient.changeBookingStatus(anyLong(), anyLong(), anyBoolean());
+        ResponseEntity dto = this.bookingClient.changeBookingStatus(bookingId, userId, approved);
 
         assertTrue(dto.getStatusCode().is2xxSuccessful());
     }
 
     @Test
     void getBooking_whenInvoked_thenStatusIsOk() {
+        long userId = 0L;
+        long bookingId = 0L;
         this.server.expect(requestTo(serverUrl + "/bookings/0"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(bookingDtoString, MediaType.APPLICATION_JSON));
 
-        ResponseEntity dto = this.bookingClient.getBooking(anyLong(), anyLong());
+        ResponseEntity dto = this.bookingClient.getBooking(userId, bookingId);
 
         assertTrue(dto.getStatusCode().is2xxSuccessful());
     }
