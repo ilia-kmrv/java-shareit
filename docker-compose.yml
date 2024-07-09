@@ -7,7 +7,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - /var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=postgres
@@ -28,7 +28,7 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-#      - "TZ=Europe/Moscow"
+      #      - "TZ=Europe/Moscow"
       - DB_NAME=shareit
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -45,3 +45,5 @@ services:
       - server
     environment:
       - SERVER_URL=http://server:9090
+volumes:
+  postgres_data:
