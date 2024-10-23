@@ -18,9 +18,14 @@
 
 ## Инструкция
 Требования: 
+- Java 11
+- Maven
 - Docker
 
 Установка:
 ```bash
 git clone https://github.com/ilia-kmrv/java-shareit.git
+cd java-shareit
+mvn clean install
+docker compose up
 ``` 
