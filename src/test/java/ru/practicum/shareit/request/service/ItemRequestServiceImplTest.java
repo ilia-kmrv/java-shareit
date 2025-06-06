@@ -37,7 +37,6 @@ class ItemRequestServiceImplTest {
     @InjectMocks
     private ItemRequestServiceImpl requestService;
 
-
     @Test
     void addItemRequest_whenUserFoundThenReturnSavedRequest() {
         ItemRequestDto itemRequestDto = ItemRequestDto.builder().build();
@@ -65,8 +64,8 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDtoWithItems> expectedDtos = List.of(dto1);
         when(userService.getUser(anyLong())).thenReturn(user);
         ItemRequest request1 = ItemRequest.builder().id(0L).build();
-        when(requestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, page)).
-                thenReturn(List.of(request1));
+        when(requestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, page))
+                .thenReturn(List.of(request1));
         when(itemRepository.findAllByRequestIdIn(anySet())).thenReturn(List.of(item));
 
         List<ItemRequestDtoWithItems> actualDtos = requestService.getAllRequests(from, size, userId);
@@ -84,8 +83,8 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDtoWithItems> expectedDtos = List.of(dto1);
         when(userService.getUser(anyLong())).thenReturn(user);
         ItemRequest request1 = ItemRequest.builder().id(0L).build();
-        when(requestRepository.findAllByRequesterIdOrderByCreatedDesc(userId)).
-                thenReturn(List.of(request1));
+        when(requestRepository.findAllByRequesterIdOrderByCreatedDesc(userId))
+                .thenReturn(List.of(request1));
         when(itemRepository.findAllByRequestIdIn(anySet())).thenReturn(List.of(item));
 
         List<ItemRequestDtoWithItems> actualDtos = requestService.getRequestsByUserId(userId);
